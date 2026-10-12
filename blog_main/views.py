@@ -42,6 +42,7 @@ def register(request):
 
 
 
+
 def login(request):
     if request.method == 'POST':
         form = AuthenticationForm(request, request.POST)
@@ -50,19 +51,21 @@ def login(request):
             username = form.cleaned_data['username']
             password = form.cleaned_data['password']
 
-            user = auth.authenticate(username=username, password=password)
+            user = auth.authenticate(
+                request,
+                username=username,
+                password=password
+            )
 
             if user is not None:
                 auth.login(request, user)
                 return redirect('dashboard')
-            else:
-                messages.error(request, 'Invalid username or password')
-        else:
-            messages.error(request, 'Please enter a valid username and password')
 
-        return redirect('login')
+        form = AuthenticationForm(request)
 
-    form = AuthenticationForm()
+    else:
+        form = AuthenticationForm(request)
+
     context = {
         'form': form,
     }
